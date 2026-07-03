@@ -941,15 +941,20 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
                   
-                  {/* Verified Email */}
-                  <Field label="Verified Email Address">
-                    <div className="relative flex items-center">
-                      <input type="email" disabled value={email}
-                        className={`${fieldBase} bg-gray-50 border-green-300 pr-10 cursor-not-allowed`} 
-                        style={{ ...fieldStyle, border: '1px solid #A7F3D0', color: TEXT_DARK }} />
-                      <span className="absolute right-3 text-green-600 text-xs font-bold flex items-center gap-0.5">
-                        ✓ Verified
-                      </span>
+                  {/* Email Input */}
+                  <Field label="Email Address">
+                    <div className="flex flex-col gap-1">
+                      <input type="email" required disabled={emailOtpVerified} placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)}
+                        className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
+                      {emailOtpVerified ? (
+                        <p className="text-xs text-green-600 font-semibold">
+                          ✓ Verified
+                        </p>
+                      ) : (
+                        <p className="text-xs" style={{ color: TEXT_MUTED }}>
+                          <em>You will verify this email in the next step.</em>
+                        </p>
+                      )}
                     </div>
                   </Field>
 
