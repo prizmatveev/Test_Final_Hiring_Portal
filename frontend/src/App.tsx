@@ -593,12 +593,7 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
   const [step, setStep] = useState<"verification" | "details" | "legal">("verification");
   
   // Verification states
-  const [phone, setPhone] = useState("");
-  const [phoneOtp, setPhoneOtp] = useState("");
-  const [phoneOtpSent, setPhoneOtpSent] = useState(false);
-  const [phoneOtpVerified, setPhoneOtpVerified] = useState(false);
-  const [phoneOtpError, setPhoneOtpError] = useState("");
-  const [isSendingPhone, setIsSendingPhone] = useState(false);
+  const [phone, setPhone] = useState(""); // Kept for Step 3
 
   const [email, setEmail] = useState("");
   const [emailOtp, setEmailOtp] = useState("");
@@ -632,49 +627,7 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
 
   const isUnpaid = job.compensation?.toLowerCase() === "unpaid";
 
-  const handleSendPhoneOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!phone) return;
-    setIsSendingPhone(true);
-    try {
-      setPhoneOtpError("");
-      const res = await fetch('/api/public/send-phone-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setPhoneOtpSent(true);
-      } else {
-        setPhoneOtpError(data.detail || data.error || "Failed to send SMS OTP.");
-      }
-    } catch (error: any) {
-      setPhoneOtpError("Network error. Please try again.");
-    } finally {
-      setIsSendingPhone(false);
-    }
-  };
 
-  const handleVerifyPhoneOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const res = await fetch('/api/public/verify-phone-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, otp: phoneOtp })
-      });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setPhoneOtpVerified(true);
-        setPhoneOtpError("");
-      } else {
-        setPhoneOtpError(data.error || "Invalid OTP.");
-      }
-    } catch (error: any) {
-      setPhoneOtpError("Network error. Please try again.");
-    }
-  };
 
   const handleSendEmailOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -851,157 +804,83 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
           <div className="w-full p-6 md:p-10 rounded-2xl border bg-white" style={{ borderColor: CREAM_BORDER }}>
             <h2 className="text-lg font-extrabold mb-8 text-center" style={{ color: TEXT_DARK }}>Step 1: Contact Verification</h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+            <div className="max-w-md mx-auto flex flex-col space-y-4">
+              <h3 className="font-bold text-md border-b pb-2" style={{ color: TEXT_DARK, borderColor: CREAM_BORDER }}>Email Address</h3>
               
-              {/* Left Column: Email Verification */}
-              <div className="flex flex-col space-y-4">
-                <h3 className="font-bold text-md border-b pb-2" style={{ color: TEXT_DARK, borderColor: CREAM_BORDER }}>Email Address</h3>
-                
-                <form onSubmit={handleSendEmailOtp} className="space-y-4">
-                  <Field label="Email">
+              <form onSubmit={handleSendEmailOtp} className="space-y-4">
+                <Field label="Email">
+                  <div className="flex flex-col gap-2">
+                    <input
+                      type="email"
+                      required
+                      disabled={emailOtpVerified}
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className={fieldBase}
+                      style={fieldStyle}
+                      onFocus={focusField}
+                      onBlur={blurField}
+                    />
+                    {!emailOtpVerified && (
+                      <button
+                        type="submit"
+                        disabled={isSendingEmail}
+                        className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all active:scale-95 hover:brightness-95 disabled:opacity-50"
+                        style={{ backgroundColor: GOLD, color: TEXT_DARK }}
+                      >
+                        {isSendingEmail ? "Sending..." : emailOtpSent ? "Resend Email OTP" : "Send Email OTP"}
+                      </button>
+                    )}
+                    {emailOtpError && !emailOtpSent && <p className="text-xs font-semibold text-red-600">{emailOtpError}</p>}
+                  </div>
+                </Field>
+              </form>
+
+              {emailOtpSent && !emailOtpVerified && (
+                <form onSubmit={handleVerifyEmailOtp} className="space-y-4 pt-2">
+                  <Field label="Enter OTP from Email">
                     <div className="flex flex-col gap-2">
                       <input
-                        type="email"
+                        type="text"
                         required
-                        disabled={emailOtpVerified}
-                        placeholder="you@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        maxLength={6}
+                        placeholder="6-digit OTP"
+                        value={emailOtp}
+                        onChange={(e) => setEmailOtp(e.target.value)}
                         className={fieldBase}
                         style={fieldStyle}
                         onFocus={focusField}
                         onBlur={blurField}
                       />
-                      {!emailOtpVerified && (
-                        <button
-                          type="submit"
-                          disabled={isSendingEmail}
-                          className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all active:scale-95 hover:brightness-95 disabled:opacity-50"
-                          style={{ backgroundColor: GOLD, color: TEXT_DARK }}
-                        >
-                          {isSendingEmail ? "Sending..." : emailOtpSent ? "Resend Email OTP" : "Send Email OTP"}
-                        </button>
-                      )}
-                      {emailOtpError && !emailOtpSent && <p className="text-xs font-semibold text-red-600">{emailOtpError}</p>}
+                      <p className="text-xs" style={{ color: TEXT_MUTED }}>
+                        <em>Note: Please check your Spam or Promotions folder if you don't see the OTP.</em>
+                      </p>
+                      {emailOtpError && <p className="text-xs font-semibold text-red-600">{emailOtpError}</p>}
+                      <button
+                        type="submit"
+                        className="w-full py-2.5 rounded-lg font-bold text-sm transition-all active:scale-95 hover:brightness-95"
+                        style={{ backgroundColor: GOLD_DARK, color: "#fff" }}
+                      >
+                        Verify Email
+                      </button>
                     </div>
                   </Field>
                 </form>
+              )}
 
-                {emailOtpSent && !emailOtpVerified && (
-                  <form onSubmit={handleVerifyEmailOtp} className="space-y-4 pt-2">
-                    <Field label="Enter OTP from Email">
-                      <div className="flex flex-col gap-2">
-                        <input
-                          type="text"
-                          required
-                          maxLength={6}
-                          placeholder="6-digit OTP"
-                          value={emailOtp}
-                          onChange={(e) => setEmailOtp(e.target.value)}
-                          className={fieldBase}
-                          style={fieldStyle}
-                          onFocus={focusField}
-                          onBlur={blurField}
-                        />
-                        <p className="text-xs" style={{ color: TEXT_MUTED }}>
-                          <em>Note: Please check your Spam or Promotions folder if you don't see the OTP.</em>
-                        </p>
-                        {emailOtpError && <p className="text-xs font-semibold text-red-600">{emailOtpError}</p>}
-                        <button
-                          type="submit"
-                          className="w-full py-2.5 rounded-lg font-bold text-sm transition-all active:scale-95 hover:brightness-95"
-                          style={{ backgroundColor: GOLD_DARK, color: "#fff" }}
-                        >
-                          Verify Email
-                        </button>
-                      </div>
-                    </Field>
-                  </form>
-                )}
-
-                {emailOtpVerified && (
-                  <div className="p-3.5 rounded-lg flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm font-medium mt-2">
-                    <span className="text-lg">✓</span> Email verified!
-                  </div>
-                )}
-              </div>
-
-              {/* Right Column: Mobile Verification */}
-              <div className="flex flex-col space-y-4">
-                <h3 className="font-bold text-md border-b pb-2" style={{ color: TEXT_DARK, borderColor: CREAM_BORDER }}>Mobile Number</h3>
-                
-                <form onSubmit={handleSendPhoneOtp} className="space-y-4">
-                  <Field label="Phone">
-                    <div className="flex flex-col gap-2">
-                      <input
-                        type="tel"
-                        required
-                        disabled={phoneOtpVerified}
-                        placeholder="+1 234 567 8900"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className={fieldBase}
-                        style={fieldStyle}
-                        onFocus={focusField}
-                        onBlur={blurField}
-                      />
-                      {!phoneOtpVerified && (
-                        <button
-                          type="submit"
-                          disabled={isSendingPhone}
-                          className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all active:scale-95 hover:brightness-95 disabled:opacity-50"
-                          style={{ backgroundColor: GOLD, color: TEXT_DARK }}
-                        >
-                          {isSendingPhone ? "Sending..." : phoneOtpSent ? "Resend SMS OTP" : "Send SMS OTP"}
-                        </button>
-                      )}
-                      {phoneOtpError && !phoneOtpSent && <p className="text-xs font-semibold text-red-600">{phoneOtpError}</p>}
-                    </div>
-                  </Field>
-                </form>
-
-                {phoneOtpSent && !phoneOtpVerified && (
-                  <form onSubmit={handleVerifyPhoneOtp} className="space-y-4 pt-2">
-                    <Field label="Enter OTP from SMS">
-                      <div className="flex flex-col gap-2">
-                        <input
-                          type="text"
-                          required
-                          maxLength={6}
-                          placeholder="6-digit OTP"
-                          value={phoneOtp}
-                          onChange={(e) => setPhoneOtp(e.target.value)}
-                          className={fieldBase}
-                          style={fieldStyle}
-                          onFocus={focusField}
-                          onBlur={blurField}
-                        />
-                        {phoneOtpError && <p className="text-xs font-semibold text-red-600">{phoneOtpError}</p>}
-                        <button
-                          type="submit"
-                          className="w-full py-2.5 rounded-lg font-bold text-sm transition-all active:scale-95 hover:brightness-95"
-                          style={{ backgroundColor: GOLD_DARK, color: "#fff" }}
-                        >
-                          Verify Mobile
-                        </button>
-                      </div>
-                    </Field>
-                  </form>
-                )}
-
-                {phoneOtpVerified && (
-                  <div className="p-3.5 rounded-lg flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm font-medium mt-2">
-                    <span className="text-lg">✓</span> Mobile verified!
-                  </div>
-                )}
-              </div>
+              {emailOtpVerified && (
+                <div className="p-3.5 rounded-lg flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm font-medium mt-2">
+                  <span className="text-lg">✓</span> Email verified!
+                </div>
+              )}
             </div>
 
             {/* Next Step Action */}
             <div className="mt-12 pt-6 border-t flex justify-center" style={{ borderColor: CREAM_BORDER }}>
               <button
                 onClick={() => setStep("details")}
-                disabled={!emailOtpVerified || !phoneOtpVerified}
+                disabled={!emailOtpVerified}
                 className="w-full md:w-1/2 py-3.5 rounded-full font-bold text-sm transition-all active:scale-95 hover:brightness-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: GOLD, color: TEXT_DARK }}
               >
@@ -1047,16 +926,10 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
                   
-                  {/* Verified Phone */}
-                  <Field label="Verified Phone Number">
-                    <div className="relative flex items-center">
-                      <input type="tel" disabled value={phone}
-                        className={`${fieldBase} bg-gray-50 border-green-300 pr-10 cursor-not-allowed`} 
-                        style={{ ...fieldStyle, border: '1px solid #A7F3D0', color: TEXT_DARK }} />
-                      <span className="absolute right-3 text-green-600 text-xs font-bold flex items-center gap-0.5">
-                        ✓ Verified
-                      </span>
-                    </div>
+                  {/* Phone Input (Moved from Verification step) */}
+                  <Field label="Phone Number">
+                    <input type="tel" required placeholder="+1 234 567 8900" value={phone} onChange={(e) => setPhone(e.target.value)}
+                      className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
                   
                   {/* Verified Email */}
