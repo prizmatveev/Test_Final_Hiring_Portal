@@ -1096,7 +1096,6 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                     <h2 className="text-xl font-bold text-center mb-1">LocalSM Recruitment &amp; Assessment Policy</h2>
                     <div className="text-center mb-6">
                       <h3 className="font-bold text-lg">Combined Round 1 + Round 2 Paper Format</h3>
-                      <p className="italic text-xs mt-1" style={{ color: TEXT_MUTED }}>Draft for internal use - review with local counsel before publishing</p>
                     </div>
 
                     <p>This policy applies to all LocalSM recruitment assessments conducted in paper form, whether the company uses a single combined paper or two labeled sections within the same paper. Round 1 is the basic screening section; Round 2 is the technical assessment section. LocalSM may change the format, sequence, difficulty, time limit, scoring, or instructions for any role or hiring cycle at its sole discretion.</p>
