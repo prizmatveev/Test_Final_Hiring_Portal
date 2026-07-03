@@ -1106,13 +1106,23 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                   <p className="text-sm font-semibold text-red-600">{submitError}</p>
                 )}
 
-                <button
-                  type="submit"
-                  className="w-full py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:brightness-95 flex items-center justify-center gap-1"
-                  style={{ backgroundColor: GOLD, color: TEXT_DARK }}
-                >
-                  Next: Legal Notice <ArrowRight className="w-4 h-4" />
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setStep("email")}
+                    className="w-1/3 py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:bg-gray-50 border flex items-center justify-center gap-1"
+                    style={{ borderColor: CREAM_BORDER, color: TEXT_DARK }}
+                  >
+                    <ArrowRight className="w-4 h-4 rotate-180" /> Back
+                  </button>
+                  <button
+                    type="submit"
+                    className="w-2/3 py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:brightness-95 flex items-center justify-center gap-1"
+                    style={{ backgroundColor: GOLD, color: TEXT_DARK }}
+                  >
+                    Next: Legal Notice <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
               </form>
             )}
           </div>
@@ -1341,14 +1351,25 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                   <p className="text-sm font-semibold text-red-600">{legalError}</p>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:brightness-95"
-                  style={{ backgroundColor: GOLD, color: TEXT_DARK }}
-                >
-                  {submitting ? "Submitting Application..." : "Submit Application"}
-                </button>
+                <div className="flex gap-3 mt-4">
+                  <button
+                    type="button"
+                    onClick={() => setStep("details")}
+                    disabled={submitting}
+                    className="w-1/3 py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:bg-gray-50 border flex items-center justify-center gap-1"
+                    style={{ borderColor: CREAM_BORDER, color: TEXT_DARK }}
+                  >
+                    <ArrowRight className="w-4 h-4 rotate-180" /> Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="w-2/3 py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:brightness-95"
+                    style={{ backgroundColor: GOLD, color: TEXT_DARK }}
+                  >
+                    {submitting ? "Submitting Application..." : "Submit Application"}
+                  </button>
+                </div>
               </form>
             )}
           </div>
