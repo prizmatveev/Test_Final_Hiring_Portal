@@ -902,6 +902,9 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                           onFocus={focusField}
                           onBlur={blurField}
                         />
+                        <p className="text-xs" style={{ color: TEXT_MUTED }}>
+                          <em>Note: Please check your Spam or Promotions folder if you don't see the OTP.</em>
+                        </p>
                         {emailOtpError && <p className="text-xs font-semibold text-red-600">{emailOtpError}</p>}
                         <button
                           type="submit"
