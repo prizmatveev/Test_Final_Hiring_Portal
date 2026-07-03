@@ -590,7 +590,7 @@ interface SelectionProcessPageProps {
 }
 
 function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
-  const [step, setStep] = useState<"verification" | "details" | "legal">("verification");
+  const [step, setStep] = useState<"details" | "verification" | "legal">("details");
   
   // Verification states
   const [phone, setPhone] = useState(""); // Kept for Step 3
@@ -680,7 +680,7 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
       return;
     }
     setSubmitError("");
-    setStep("legal");
+    setStep("verification");
   };
 
   const handleLegalSubmit = async (e: React.FormEvent) => {
@@ -735,8 +735,8 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
   };
 
   const steps = [
-    { id: "verification", label: "Dual Verification" },
     { id: "details", label: "Application Details" },
+    { id: "verification", label: "Email Verification" },
     { id: "legal", label: "Legal Notice" },
   ];
 
@@ -764,9 +764,10 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
         <div className="flex items-center justify-between w-full mb-12 px-4">
           {steps.map((s, idx) => {
             const isActive = step === s.id;
-            const isCompleted = 
-              (s.id === "verification" && (step === "details" || step === "legal")) ||
-              (s.id === "details" && step === "legal");
+            const stepOrder = ["details", "verification", "legal"];
+            const currentIdx = stepOrder.indexOf(step as string);
+            const sIdx = stepOrder.indexOf(s.id);
+            const isCompleted = currentIdx > sIdx;
             
             return (
               <React.Fragment key={s.id}>
@@ -799,10 +800,10 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
           })}
         </div>
 
-        {/* Step 1: Dual Verification */}
+        {/* Step 2: Email Verification */}
         {step === "verification" && (
           <div className="w-full p-6 md:p-10 rounded-2xl border bg-white" style={{ borderColor: CREAM_BORDER }}>
-            <h2 className="text-lg font-extrabold mb-8 text-center" style={{ color: TEXT_DARK }}>Step 1: Contact Verification</h2>
+            <h2 className="text-lg font-extrabold mb-8 text-center" style={{ color: TEXT_DARK }}>Step 2: Email Verification</h2>
             
             <div className="max-w-md mx-auto flex flex-col space-y-4">
               <h3 className="font-bold text-md border-b pb-2" style={{ color: TEXT_DARK, borderColor: CREAM_BORDER }}>Email Address</h3>
@@ -877,20 +878,28 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
             </div>
 
             {/* Next Step Action */}
-            <div className="mt-12 pt-6 border-t flex justify-center" style={{ borderColor: CREAM_BORDER }}>
+            <div className="mt-12 pt-6 border-t flex gap-3" style={{ borderColor: CREAM_BORDER }}>
               <button
+                type="button"
                 onClick={() => setStep("details")}
+                className="w-1/3 py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:bg-gray-50 border flex items-center justify-center gap-1"
+                style={{ borderColor: CREAM_BORDER, color: TEXT_DARK }}
+              >
+                <ArrowRight className="w-4 h-4 rotate-180" /> Back
+              </button>
+              <button
+                onClick={() => setStep("legal")}
                 disabled={!emailOtpVerified}
-                className="w-full md:w-1/2 py-3.5 rounded-full font-bold text-sm transition-all active:scale-95 hover:brightness-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-2/3 py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:brightness-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: GOLD, color: TEXT_DARK }}
               >
-                Proceed to Application Details <ArrowRight className="w-4 h-4" />
+                Proceed to Legal Notice <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* Step 3: Application Form */}
+        {/* Step 1: Application Form */}
         {step === "details" && (
           <div className="w-full p-10 rounded-2xl border bg-white" style={{ borderColor: CREAM_BORDER }}>
             {submitted ? (
@@ -913,7 +922,7 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
             ) : (
               <form onSubmit={handleDetailsSubmit} className="space-y-6">
                 <h2 className="text-lg font-extrabold mb-4 pb-2 border-b" style={{ color: TEXT_DARK, borderColor: CREAM_BORDER }}>
-                  Step 3: Applicant Details
+                  Step 1: Applicant Details
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -1023,21 +1032,22 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                   <p className="text-sm font-semibold text-red-600">{submitError}</p>
                 )}
 
-                <div className="flex gap-3">
+                <div className="mt-12 pt-6 border-t flex gap-3" style={{ borderColor: CREAM_BORDER }}>
                   <button
                     type="button"
-                    onClick={() => setStep("verification")}
+                    onClick={onBack}
                     className="w-1/3 py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:bg-gray-50 border flex items-center justify-center gap-1"
                     style={{ borderColor: CREAM_BORDER, color: TEXT_DARK }}
                   >
-                    <ArrowRight className="w-4 h-4 rotate-180" /> Back
+                    <ArrowRight className="w-4 h-4 rotate-180" /> Back to Roles
                   </button>
                   <button
-                    type="submit"
+                    type="button"
+                    onClick={() => setStep("verification")}
                     className="w-2/3 py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:brightness-95 flex items-center justify-center gap-1"
                     style={{ backgroundColor: GOLD, color: TEXT_DARK }}
                   >
-                    Next: Legal Notice <ArrowRight className="w-4 h-4" />
+                    Next: Email Verification <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </form>
@@ -1045,7 +1055,7 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
           </div>
         )}
 
-        {/* Step 4: Legal Notice */}
+        {/* Step 3: Legal Notice */}
         {step === "legal" && (
           <div className="w-full p-10 rounded-2xl border bg-white" style={{ borderColor: CREAM_BORDER }}>
             {submitted ? (
@@ -1068,7 +1078,7 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
             ) : (
               <form onSubmit={handleLegalSubmit} className="space-y-6">
                 <h2 className="text-lg font-extrabold mb-1 pb-2 border-b" style={{ color: TEXT_DARK, borderColor: CREAM_BORDER }}>
-                  Step 4: Legal Notice
+                  Step 3: Legal Notice
                 </h2>
                 <p className="text-xs leading-relaxed" style={{ color: TEXT_MUTED }}>
                   Please read the following documents carefully before submitting your application.
