@@ -4,8 +4,6 @@ import {
   MapPin, ArrowRight,
   ArrowLeft, CheckCircle2, X, Upload,
 } from "lucide-react";
-import { auth } from './firebaseConfig';
-import { RecaptchaVerifier, signInWithPhoneNumber, ConfirmationResult } from 'firebase/auth';
 import { JOB_DETAILS, type JobDetail } from "./jobData";
 
 /* ─── Brand Colors ─── */
@@ -600,7 +598,6 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
   const [phoneOtpSent, setPhoneOtpSent] = useState(false);
   const [phoneOtpVerified, setPhoneOtpVerified] = useState(false);
   const [phoneOtpError, setPhoneOtpError] = useState("");
-  const [phoneConfirmationResult, setPhoneConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [isSendingPhone, setIsSendingPhone] = useState(false);
 
   const [email, setEmail] = useState("");
@@ -635,28 +632,25 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
 
   const isUnpaid = job.compensation?.toLowerCase() === "unpaid";
 
-  const setupRecaptcha = () => {
-    if (!(window as any).recaptchaVerifier) {
-      (window as any).recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        size: 'invisible'
-      });
-    }
-  };
-
   const handleSendPhoneOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phone) return;
     setIsSendingPhone(true);
     try {
       setPhoneOtpError("");
-      setupRecaptcha();
-      const appVerifier = (window as any).recaptchaVerifier;
-      const confirmationResult = await signInWithPhoneNumber(auth, phone, appVerifier);
-      setPhoneConfirmationResult(confirmationResult);
-      setPhoneOtpSent(true);
+      const res = await fetch('/api/public/send-phone-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPhoneOtpSent(true);
+      } else {
+        setPhoneOtpError(data.error || "Failed to send SMS OTP.");
+      }
     } catch (error: any) {
-      console.error(error);
-      setPhoneOtpError(error.message || "Failed to send SMS OTP.");
+      setPhoneOtpError("Network error. Please try again.");
     } finally {
       setIsSendingPhone(false);
     }
@@ -664,13 +658,21 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
 
   const handleVerifyPhoneOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!phoneConfirmationResult) return;
     try {
-      await phoneConfirmationResult.confirm(phoneOtp);
-      setPhoneOtpVerified(true);
-      setPhoneOtpError("");
+      const res = await fetch('/api/public/verify-phone-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, otp: phoneOtp })
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setPhoneOtpVerified(true);
+        setPhoneOtpError("");
+      } else {
+        setPhoneOtpError(data.error || "Invalid OTP.");
+      }
     } catch (error: any) {
-      setPhoneOtpError("Invalid OTP or expired.");
+      setPhoneOtpError("Network error. Please try again.");
     }
   };
 
@@ -848,7 +850,6 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
         {step === "verification" && (
           <div className="w-full p-6 md:p-10 rounded-2xl border bg-white" style={{ borderColor: CREAM_BORDER }}>
             <h2 className="text-lg font-extrabold mb-8 text-center" style={{ color: TEXT_DARK }}>Step 1: Contact Verification</h2>
-            <div id="recaptcha-container"></div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
               

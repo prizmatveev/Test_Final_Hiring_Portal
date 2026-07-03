@@ -299,5 +299,84 @@ router.post('/verify-email-otp', (req, res) => {
     res.status(500).json({ error: 'Failed to verify OTP' });
   }
 });
+// ── Phone OTP Endpoints ───────────────────────────────────────────────────────
+
+router.post('/send-phone-otp', async (req, res) => {
+  try {
+    const { phone } = req.body;
+    if (!phone) {
+      return res.status(400).json({ error: 'Phone number is required' });
+    }
+
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Store OTP with 10 minute expiration
+    otpStore.set(phone, {
+      otp,
+      expiresAt: Date.now() + 10 * 60 * 1000 
+    });
+
+    if (process.env.FAST2SMS_API_KEY) {
+      // Send Real SMS via Fast2SMS
+      const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+        method: 'POST',
+        headers: {
+          'authorization': process.env.FAST2SMS_API_KEY,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          variables_values: otp,
+          route: 'otp',
+          numbers: phone.replace(/\D/g, '') // strip non-numeric (e.g. +91 to 91)
+        })
+      });
+      
+      const data = await response.json();
+      if (!data.return) {
+        throw new Error(data.message || 'Fast2SMS failed to send');
+      }
+    } else {
+      // Fallback: Mock SMS in Console
+      console.log('----------------------------------------------------');
+      console.log(`[MOCK SMS] To: ${phone} | OTP: ${otp}`);
+      console.log('----------------------------------------------------');
+    }
+
+    res.json({ success: true, message: 'Phone OTP sent' });
+  } catch (error) {
+    console.error('[Send Phone OTP] Error:', error);
+    res.status(500).json({ error: 'Failed to send Phone OTP', detail: error.message });
+  }
+});
+
+router.post('/verify-phone-otp', async (req, res) => {
+  try {
+    const { phone, otp } = req.body;
+    if (!phone || !otp) {
+      return res.status(400).json({ error: 'Phone and OTP are required' });
+    }
+
+    const record = otpStore.get(phone);
+    if (!record) {
+      return res.status(400).json({ error: 'OTP not requested or expired' });
+    }
+
+    if (Date.now() > record.expiresAt) {
+      otpStore.delete(phone);
+      return res.status(400).json({ error: 'OTP has expired' });
+    }
+
+    if (record.otp === otp) {
+      otpStore.delete(phone);
+      return res.json({ success: true, message: 'OTP verified successfully' });
+    } else {
+      return res.status(400).json({ error: 'Invalid OTP' });
+    }
+  } catch (error) {
+    console.error('[Verify Phone OTP] Error:', error);
+    res.status(500).json({ error: 'Failed to verify OTP' });
+  }
+});
 
 export default router;
