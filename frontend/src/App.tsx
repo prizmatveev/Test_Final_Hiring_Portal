@@ -1156,10 +1156,32 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                     <span className="text-xs font-bold" style={{ color: TEXT_DARK }}>📄 LocalSM Recruitment & Assessment Policy</span>
                   </div>
                   <div className="w-full overflow-y-auto bg-white p-6 text-sm space-y-4" style={{ height: "400px", color: TEXT_DARK }}>
-                    <h2 className="text-xl font-bold text-center mb-4">LocalSM Recruitment &amp; Assessment Policy</h2>
-                    
+                    <h2 className="text-xl font-bold text-center mb-1">LocalSM Recruitment &amp; Assessment Policy</h2>
+                    <div className="text-center mb-6">
+                      <h3 className="font-bold text-lg">Combined Round 1 + Round 2 Paper Format</h3>
+                      <p className="italic text-xs mt-1" style={{ color: TEXT_MUTED }}>Draft for internal use - review with local counsel before publishing</p>
+                    </div>
+
+                    <p>This policy applies to all LocalSM recruitment assessments conducted in paper form, whether the company uses a single combined paper or two labeled sections within the same paper. Round 1 is the basic screening section; Round 2 is the technical assessment section. LocalSM may change the format, sequence, difficulty, time limit, scoring, or instructions for any role or hiring cycle at its sole discretion.</p>
+
                     <section>
-                      <h3 className="font-bold mb-2" style={{ color: '#1e3a8a' }}>3. Candidate Duties</h3>
+                      <h3 className="font-bold mb-2 mt-4" style={{ color: '#1e3a8a' }}>1. Acceptance of Policy</h3>
+                      <p>By registering for, accessing, signing, attempting, or submitting any LocalSM recruitment assessment, the candidate acknowledges that this policy has been read, understood, and accepted. Participation is voluntary, but compliance is mandatory. If a candidate does not agree to these terms, the candidate must not take the assessment.</p>
+                    </section>
+
+                    <section>
+                      <h3 className="font-bold mb-2 mt-4" style={{ color: '#1e3a8a' }}>2. Structure of the Assessment</h3>
+                      <p>LocalSM may use either of the following structures, depending on the role:</p>
+                      <ul className="list-disc pl-5 space-y-1 mt-2">
+                        <li>A single paper containing both Round 1 and Round 2 as separate sections; or</li>
+                        <li>Two separate rounds conducted on the same day or on different dates.</li>
+                      </ul>
+                      <p className="mt-2">Round 1 is a basic screening section intended to test fundamentals, clarity of thought, communication, and immediate role fit. Round 2 is a deeper assessment intended to test engineering judgment, architecture, reasoning, security awareness, product thinking, and problem solving under constraints.</p>
+                      <p className="mt-2">The same paper format shall not be treated as a universal template for all roles. LocalSM may use a different paper, different scoring rules, or different question types for different positions or recruitment cycles.</p>
+                    </section>
+
+                    <section>
+                      <h3 className="font-bold mb-2 mt-4" style={{ color: '#1e3a8a' }}>3. Candidate Duties</h3>
                       <ul className="list-disc pl-5 space-y-1">
                         <li>Work independently and honestly.</li>
                         <li>Follow every instruction exactly as written.</li>
