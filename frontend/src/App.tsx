@@ -349,24 +349,24 @@ function ApplyModal({ job, onClose }: { job: JobDetail; onClose: () => void }) {
           <form onSubmit={handleSubmit} className="px-6 py-6 space-y-6">
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Field label="Full Name">
-                <input type="text" required placeholder="Your name" value={form.name} onChange={set("name")}
+              <Field label="Full Name" optional>
+                <input type="text" placeholder="Your name" value={form.name} onChange={set("name")}
                   className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
               </Field>
               <Field label="Email">
                 <input type="email" required placeholder="you@example.com" value={form.email} onChange={set("email")}
                   className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
               </Field>
-              <Field label="Phone Number">
+              <Field label="Phone Number" optional>
                 <input type="tel" required placeholder="+91 98765 43210" value={form.phone} onChange={set("phone")}
                   className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
               </Field>
-              <Field label="Location">
-                <input type="text" required placeholder="City, Country" value={form.location} onChange={set("location")}
+              <Field label="Location" optional>
+                <input type="text" placeholder="City, Country" value={form.location} onChange={set("location")}
                   className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
               </Field>
-              <Field label="LinkedIn">
-                <input type="url" required placeholder="linkedin.com/in/yourname" value={form.linkedin} onChange={set("linkedin")}
+              <Field label="LinkedIn" optional>
+                <input type="url" placeholder="linkedin.com/in/yourname" value={form.linkedin} onChange={set("linkedin")}
                   className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
               </Field>
               <Field label="Portfolio / GitHub" optional>
@@ -382,7 +382,7 @@ function ApplyModal({ job, onClose }: { job: JobDetail; onClose: () => void }) {
               </Field>
             )}
 
-            <Field label="Resume">
+            <Field label="Resume" optional>
               <label
                 className="flex items-center gap-3 px-3.5 py-3 rounded-lg cursor-pointer"
                 style={{ border: `1px dashed ${CREAM_BORDER}` }}
@@ -417,9 +417,8 @@ function ApplyModal({ job, onClose }: { job: JobDetail; onClose: () => void }) {
             {job.customQuestions.length > 0 && (
               <div className="space-y-5 pt-1 border-t" style={{ borderColor: CREAM_BORDER }}>
                 {job.customQuestions.map((q, i) => (
-                  <Field key={i} label={q}>
+                  <Field key={i} label={q} optional>
                     <textarea
-                      required
                       rows={2}
                       placeholder="Your answer..."
                       value={answers[i] ?? ""}
@@ -675,12 +674,8 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
 
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!resumeFile) {
-      setSubmitError("Please upload your resume.");
-      return;
-    }
     setSubmitError("");
-    setStep("verification");
+    setStep("legal");
   };
 
   const handleLegalSubmit = async (e: React.FormEvent) => {
@@ -736,7 +731,6 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
 
   const steps = [
     { id: "details", label: "Application Details" },
-    { id: "verification", label: "Email Verification" },
     { id: "legal", label: "Legal Notice" },
   ];
 
@@ -764,7 +758,7 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
         <div className="flex items-center justify-between w-full mb-12 px-4">
           {steps.map((s, idx) => {
             const isActive = step === s.id;
-            const stepOrder = ["details", "verification", "legal"];
+            const stepOrder = ["details", "legal"];
             const currentIdx = stepOrder.indexOf(step as string);
             const sIdx = stepOrder.indexOf(s.id);
             const isCompleted = currentIdx > sIdx;
@@ -800,105 +794,6 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
           })}
         </div>
 
-        {/* Step 2: Email Verification */}
-        {step === "verification" && (
-          <div className="w-full p-6 md:p-10 rounded-2xl border bg-white" style={{ borderColor: CREAM_BORDER }}>
-            <h2 className="text-lg font-extrabold mb-8 text-center" style={{ color: TEXT_DARK }}>Step 2: Email Verification</h2>
-            
-            <div className="max-w-md mx-auto flex flex-col space-y-4">
-              <h3 className="font-bold text-md border-b pb-2" style={{ color: TEXT_DARK, borderColor: CREAM_BORDER }}>Email Address</h3>
-              
-              <form onSubmit={handleSendEmailOtp} className="space-y-4">
-                <Field label="Email">
-                  <div className="flex flex-col gap-2">
-                    <input
-                      type="email"
-                      required
-                      disabled={emailOtpVerified}
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className={fieldBase}
-                      style={fieldStyle}
-                      onFocus={focusField}
-                      onBlur={blurField}
-                    />
-                    {!emailOtpVerified && (
-                      <button
-                        type="submit"
-                        disabled={isSendingEmail}
-                        className="w-full py-2.5 rounded-lg text-sm font-semibold transition-all active:scale-95 hover:brightness-95 disabled:opacity-50"
-                        style={{ backgroundColor: GOLD, color: TEXT_DARK }}
-                      >
-                        {isSendingEmail ? "Sending..." : emailOtpSent ? "Resend Email OTP" : "Send Email OTP"}
-                      </button>
-                    )}
-                    {emailOtpError && !emailOtpSent && <p className="text-xs font-semibold text-red-600">{emailOtpError}</p>}
-                  </div>
-                </Field>
-              </form>
-
-              {emailOtpSent && !emailOtpVerified && (
-                <form onSubmit={handleVerifyEmailOtp} className="space-y-4 pt-2">
-                  <Field label="Enter OTP from Email">
-                    <div className="flex flex-col gap-2">
-                      <input
-                        type="text"
-                        required
-                        maxLength={6}
-                        placeholder="6-digit OTP"
-                        value={emailOtp}
-                        onChange={(e) => setEmailOtp(e.target.value)}
-                        className={fieldBase}
-                        style={fieldStyle}
-                        onFocus={focusField}
-                        onBlur={blurField}
-                      />
-                      <p className="text-xs" style={{ color: TEXT_MUTED }}>
-                        <em>Note: Please check your Spam or Promotions folder if you don't see the OTP.</em>
-                      </p>
-                      {emailOtpError && <p className="text-xs font-semibold text-red-600">{emailOtpError}</p>}
-                      <button
-                        type="submit"
-                        className="w-full py-2.5 rounded-lg font-bold text-sm transition-all active:scale-95 hover:brightness-95"
-                        style={{ backgroundColor: GOLD_DARK, color: "#fff" }}
-                      >
-                        Verify Email
-                      </button>
-                    </div>
-                  </Field>
-                </form>
-              )}
-
-              {emailOtpVerified && (
-                <div className="p-3.5 rounded-lg flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 text-sm font-medium mt-2">
-                  <span className="text-lg">✓</span> Email verified!
-                </div>
-              )}
-            </div>
-
-            {/* Next Step Action */}
-            <div className="mt-12 pt-6 border-t flex gap-3" style={{ borderColor: CREAM_BORDER }}>
-              <button
-                type="button"
-                onClick={() => setStep("details")}
-                className="w-1/3 py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:bg-gray-50 border flex items-center justify-center gap-1"
-                style={{ borderColor: CREAM_BORDER, color: TEXT_DARK }}
-              >
-                <ArrowRight className="w-4 h-4 rotate-180" /> Back
-              </button>
-              <button
-                onClick={() => setStep("legal")}
-                disabled={!emailOtpVerified}
-                className="w-2/3 py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:brightness-95 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ backgroundColor: GOLD, color: TEXT_DARK }}
-              >
-                Proceed to Legal Notice <ArrowRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Step 1: Application Form */}
         {step === "details" && (
           <div className="w-full p-10 rounded-2xl border bg-white" style={{ borderColor: CREAM_BORDER }}>
@@ -926,18 +821,18 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <Field label="Full Name">
-                    <input type="text" required placeholder="Your name" value={form.name} onChange={setField("name")}
+                  <Field label="Full Name" optional>
+                    <input type="text" placeholder="Your name" value={form.name} onChange={setField("name")}
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
-                  <Field label="Location">
-                    <input type="text" required placeholder="City, Country" value={form.location} onChange={setField("location")}
+                  <Field label="Location" optional>
+                    <input type="text" placeholder="City, Country" value={form.location} onChange={setField("location")}
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
                   
                   {/* Phone Input (Moved from Verification step) */}
-                  <Field label="Phone Number">
-                    <input type="tel" required placeholder="+1 234 567 8900" value={phone} onChange={(e) => setPhone(e.target.value)}
+                  <Field label="Phone Number" optional>
+                    <input type="tel" placeholder="+1 234 567 8900" value={phone} onChange={(e) => setPhone(e.target.value)}
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
                   
@@ -958,8 +853,8 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                     </div>
                   </Field>
 
-                  <Field label="LinkedIn">
-                    <input type="url" required placeholder="linkedin.com/in/yourname" value={form.linkedin} onChange={setField("linkedin")}
+                  <Field label="LinkedIn" optional>
+                    <input type="url" placeholder="linkedin.com/in/yourname" value={form.linkedin} onChange={setField("linkedin")}
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
                   <Field label="Portfolio / GitHub" optional>
@@ -975,7 +870,7 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                   </Field>
                 )}
 
-                <Field label="Resume">
+                <Field label="Resume" optional>
                   <label
                     className="flex items-center gap-3 px-3.5 py-3 rounded-lg cursor-pointer transition-colors hover:bg-gray-50"
                     style={{ border: `1px dashed ${CREAM_BORDER}` }}
@@ -1016,9 +911,8 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                   <div className="space-y-5 pt-5 border-t" style={{ borderColor: CREAM_BORDER }}>
                     <h3 className="font-extrabold text-sm" style={{ color: TEXT_DARK }}>Additional Questions</h3>
                     {job.customQuestions.map((q, i) => (
-                      <Field key={i} label={q}>
+                      <Field key={i} label={q} optional>
                         <textarea
-                          required
                           rows={2}
                           placeholder="Your answer..."
                           value={answers[i] ?? ""}

@@ -15,7 +15,7 @@ const applicationSchema = new mongoose.Schema(
     linkedin: { type: String, default: '' },
     github: { type: String, default: '' },
     portfolio: { type: String },
-    phone: { type: String, required: true },
+    phone: { type: String, default: '' },
     location: { type: String },
     yearsExperience: { type: String },
     currentCompany: { type: String },

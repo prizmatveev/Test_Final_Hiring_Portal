@@ -132,9 +132,9 @@ router.post('/apply', upload.single('resume'), async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!jobId || !name || !email || !phone) {
+    if (!jobId) {
       return res.status(400).json({
-        error: 'Missing required fields: jobId, name, email, and phone are required'
+        error: 'Missing required fields: jobId is required'
       });
     }
 
