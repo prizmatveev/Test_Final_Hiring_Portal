@@ -1,9 +1,14 @@
-import app from '../backend/src/app.js';
-import connectDB from '../backend/src/config/db.js';
-
+let app;
+let connectDB;
 let isConnected = false;
 
-const handler = async (req, res) => {
+module.exports = async (req, res) => {
+  // Dynamically import ES modules to bypass Vercel ESM syntax errors
+  if (!app) {
+    app = (await import('../backend/src/app.js')).default;
+    connectDB = (await import('../backend/src/config/db.js')).default;
+  }
+
   // Only connect to DB if not already connected
   if (!isConnected) {
     try {
@@ -18,5 +23,3 @@ const handler = async (req, res) => {
   // Delegate request to Express app
   return app(req, res);
 };
-
-export default handler;
