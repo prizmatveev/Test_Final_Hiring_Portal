@@ -287,7 +287,6 @@ function ApplyModal({ job, onClose }: { job: JobDetail; onClose: () => void }) {
     }));
     formData.append("customAnswers", JSON.stringify(customAnswersArray));
 
-    const fileInput = e.currentTarget.querySelector('input[type="file"]') as HTMLInputElement;
     if (fileInput && fileInput.files && fileInput.files[0]) {
       formData.append("resume", fileInput.files[0]);
     }
