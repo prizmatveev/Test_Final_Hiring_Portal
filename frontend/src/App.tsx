@@ -264,6 +264,12 @@ function ApplyModal({ job, onClose }: { job: JobDetail; onClose: () => void }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const fileInput = e.currentTarget.querySelector('input[type="file"]') as HTMLInputElement;
+    if (!form.name || !form.email || !form.phone || !fileInput?.files?.[0]) {
+      alert("Please provide your Name, Email, Phone Number, and Resume.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("jobId", (job as any)._id || (job as any).id || job.title);
     formData.append("name", form.name);
@@ -349,16 +355,16 @@ function ApplyModal({ job, onClose }: { job: JobDetail; onClose: () => void }) {
           <form onSubmit={handleSubmit} className="px-6 py-6 space-y-6">
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              <Field label="Full Name" optional>
-                <input type="text" placeholder="Your name" value={form.name} onChange={set("name")}
+              <Field label="Full Name">
+                <input required type="text" placeholder="Your name" value={form.name} onChange={set("name")}
                   className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
               </Field>
-              <Field label="Email" optional>
-                <input type="email" placeholder="you@example.com" value={form.email} onChange={set("email")}
+              <Field label="Email">
+                <input required type="email" placeholder="you@example.com" value={form.email} onChange={set("email")}
                   className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
               </Field>
-              <Field label="Phone Number" optional>
-                <input type="tel" placeholder="+91 98765 43210" value={form.phone} onChange={set("phone")}
+              <Field label="Phone Number">
+                <input required type="tel" placeholder="+91 98765 43210" value={form.phone} onChange={set("phone")}
                   className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
               </Field>
               <Field label="Location" optional>
@@ -386,7 +392,7 @@ function ApplyModal({ job, onClose }: { job: JobDetail; onClose: () => void }) {
               </Field>
             )}
 
-            <Field label="Resume" optional>
+            <Field label="Resume">
               <label
                 className="flex items-center gap-3 px-3.5 py-3 rounded-lg cursor-pointer"
                 style={{ border: `1px dashed ${CREAM_BORDER}` }}
@@ -677,6 +683,10 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
 
   const handleDetailsSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.name || !email || !phone || !resumeFile) {
+      alert("Please provide your Name, Email, Phone Number, and Resume.");
+      return;
+    }
     setSubmitError("");
     setStep("legal");
   };
@@ -832,8 +842,8 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                 </h2>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <Field label="Full Name" optional>
-                    <input type="text" placeholder="Your name" value={form.name} onChange={setField("name")}
+                  <Field label="Full Name">
+                    <input required type="text" placeholder="Your name" value={form.name} onChange={setField("name")}
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
                   <Field label="Location" optional>
@@ -841,13 +851,13 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
                   
-                  <Field label="Phone Number" optional>
-                    <input type="tel" placeholder="+1 234 567 8900" value={phone} onChange={(e) => setPhone(e.target.value)}
+                  <Field label="Phone Number">
+                    <input required type="tel" placeholder="+1 234 567 8900" value={phone} onChange={(e) => setPhone(e.target.value)}
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
                   
-                  <Field label="Email Address" optional>
-                    <input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)}
+                  <Field label="Email Address">
+                    <input required type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)}
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
 
@@ -872,7 +882,7 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                   </Field>
                 )}
 
-                <Field label="Resume" optional>
+                <Field label="Resume">
                   <label
                     className="flex items-center gap-3 px-3.5 py-3 rounded-lg cursor-pointer transition-colors hover:bg-gray-50"
                     style={{ border: `1px dashed ${CREAM_BORDER}` }}
