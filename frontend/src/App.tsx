@@ -851,7 +851,7 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                   </Field>
                   
                   <Field label="Phone Number">
-                    <input required type="tel" placeholder="+1 234 567 8900" value={phone} onChange={(e) => setPhone(e.target.value)}
+                    <input required type="tel" placeholder="+91 98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)}
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
                   
@@ -952,8 +952,7 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                     <ArrowRight className="w-4 h-4 rotate-180" /> Back to Roles
                   </button>
                   <button
-                    type="button"
-                    onClick={() => setStep("legal")}
+                    type="submit"
                     className="w-2/3 py-3 rounded-full font-bold text-sm transition-all active:scale-95 hover:brightness-95 flex items-center justify-center gap-1"
                     style={{ backgroundColor: GOLD, color: TEXT_DARK }}
                   >
