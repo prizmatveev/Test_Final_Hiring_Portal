@@ -369,8 +369,12 @@ function ApplyModal({ job, onClose }: { job: JobDetail; onClose: () => void }) {
                 <input type="url" placeholder="linkedin.com/in/yourname" value={form.linkedin} onChange={set("linkedin")}
                   className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
               </Field>
-              <Field label="Portfolio / GitHub" optional>
-                <input type="url" placeholder="Link to your work" value={form.portfolio} onChange={set("portfolio")}
+              <Field label="Portfolio" optional>
+                <input type="url" placeholder="Link to your portfolio" value={form.portfolio} onChange={set("portfolio")}
+                  className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
+              </Field>
+              <Field label="GitHub" optional>
+                <input type="url" placeholder="github.com/yourname" value={form.github} onChange={set("github")}
                   className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
               </Field>
             </div>
@@ -851,8 +855,12 @@ function SelectionProcessPage({ job, onBack }: SelectionProcessPageProps) {
                     <input type="url" placeholder="linkedin.com/in/yourname" value={form.linkedin} onChange={setField("linkedin")}
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
-                  <Field label="Portfolio / GitHub" optional>
-                    <input type="url" placeholder="Link to your work" value={form.portfolio} onChange={setField("portfolio")}
+                  <Field label="Portfolio" optional>
+                    <input type="url" placeholder="Link to your portfolio" value={form.portfolio} onChange={setField("portfolio")}
+                      className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
+                  </Field>
+                  <Field label="GitHub" optional>
+                    <input type="url" placeholder="github.com/yourname" value={form.github} onChange={setField("github")}
                       className={fieldBase} style={fieldStyle} onFocus={focusField} onBlur={blurField} />
                   </Field>
                 </div>
